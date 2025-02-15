@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .question {
+            margin-bottom: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+        .visible {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to physics-math quiz game!</h1>
+
+    <div id="start-screen">
+        <label for="player-name">What is your name dude?</label>
+        <input type="text" id="player-name" placeholder="Enter your name">
+        <button onclick="startGame()">Start Game</button>
+    </div>
+
+    <div id="game-screen" class="hidden">
+        <p id="greeting"></p>
+        <p id="life-score">Life: <span id="life">5</span>, Score: <span id="score">0</span></p>
+
+        <div id="question-container" class="question"></div>
+        <button id="next-btn" class="hidden" onclick="nextQuestion()">Next Question</button>
+    </div>
+
+    <div id="end-screen" class="hidden">
+        <h2>Game Over dude! You're loser so dumb asf</h2>
+        <p>Your final score is: <span id="final-score"></span></p>
+        <button onclick="restartGame()">Play Again</button>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "1) The weight of a truck and it contains 125 bags of cement is 10.75 tons. If each bag of cement weighs 51 kg, how much does the empty truck weigh?",
+                options: ["4375 Kg", "3547 Kg", "4456 Kg", "4380 Kg"],
+                answer: 0
+            },
+            {
+                question: "2) Which number is 100 more than 5,432?",
+                options: ["6432", "5532", "5442", "5433"],
+                answer: 1
+            },
+            {   
+                question: "3) If 𝑥𝑦=2 and 𝑥²+𝑦²=5, then 𝑥/y + y/z= ??",
+                options: ["1/3", "4/8", "5/2", "2/8"],
+                answer: 2
+            },
+            {   
+                question: "4) If the pattern 3, 6, 9, 12 was continued, which of these numbers would be one of the numbers in the pattern?",
+                options: ["36", "27", "21", "81"],
+                answer: 1
+            },
+            {
+                question: "5) On his birthday, Gerry received a gift of some money. He used a quarter to buy books and used it one third of the remainder to buy some foods. If after the purchase Gerry still has IDR 50,000.00. Then how much is the total money that he received?",
+                options: ["IDR 80,000.00", "IDR 100,000.00", "IDR 120,000.00", "IDR 160,000.00"],
+                answer: 1
+            },
+            {
+                question: "6) An obejct floats on the surface of water coated with oil with 50% of the object's volume in the waterand 40% of the object's volume in the oil, the rest is above the surfaceof the oil. If the density of the oil is 0.8 g/cm³then the density of the object is .... g/cm³",
+                options: ["0.68", "0.75", "0.82", "0.92"],
+                answer: 2
+            },
+            {
+                question: "7) A lump of ice with a density of 0.90 gram/cm³ is put into oil with a density of 0.80 gram/cm³. The phenomenon that occurs is??",
+                options: ["Floating ice", "0.5 ice part sinks", "The ice is completely submerged", "8/9 part of the ice that sinks"],
+                answer: 2
+            },
+            {
+                question: "8) Kenapa pada roda bisa berputar pada permukaan bidang?",
+                options: ["Karena bentuk lingkaran", "Karena bentuk desainnya", "Karena bentuk gaya gravitasi", "karena gaya gesek"],
+                answer: 3
+            },
+            {
+                questions: "9) Kenapa ganggang pintu diletakkan jauh dari titik engsel",
+                options: ["Karena prinsip Newton's second law ∑F=ma", "Karena prinsip Newton's first law ∑F=0", "Karena prinsip Torque τ=F.r", "Karena prinsip Momen Inersia I=mr²"],
+                answer: 2
+            },
+            {
+                question: "10) Jika pada jembatan memiliki tegangan > regangan, maka??",
+                options: ["Modulus young (E) akan lebih besar dan kaku akhirnya menjadi kuat", "Modulus Young (E) akan lebih besar dan kaku akhirnya menjadi rapuh", "Modulus young (E) akan lebih kecil dan kaku akhirnya menjadi kuat", "Modulus young (E) akan lebih kecil dan lentur akhirnya menjadi kuat"],
+                answer: 1
+            }
+
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let life = 5;
+
+        function startGame() {
+            const playerName = document.getElementById("player-name").value;
+            if (!playerName) {
+                alert("Please enter your name to start the game!");
+                return;
+            }
+
+            document.getElementById("start-screen").classList.add("hidden");
+            document.getElementById("game-screen").classList.remove("hidden");
+
+            document.getElementById("greeting").innerText = `Yowes ${playerName}, kamu punya ${life} kesempatan.`;
+
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                endGame();
+                return;
+            }
+
+            const questionData = questions[currentQuestionIndex];
+            const questionContainer = document.getElementById("question-container");
+            
+            questionContainer.innerHTML = `
+                <p>${questionData.question}</p>
+                ${questionData.options.map((option, index) => `
+                    <label>
+                        <input type="radio" name="answer" value="${index}">
+                        ${option}
+                    </label><br>
+                `).join("")}
+            `;
+
+            document.getElementById("next-btn").classList.remove("hidden");
+        }
+
+        function nextQuestion() {
+            const selectedAnswer = document.querySelector('input[name="answer"]:checked');
+            if (!selectedAnswer) {
+                alert("Please select an answer before proceeding!");
+                return;
+            }
+
+            const answerIndex = parseInt(selectedAnswer.value);
+            const questionData = questions[currentQuestionIndex];
+
+            if (answerIndex === questionData.answer) {
+                score += 10;
+                alert("Nice dude! Your answer is correct.");
+            } else {
+                life -= 1;
+                alert("Oops, You got wrong, go to study now.");
+            }
+
+            document.getElementById("score").innerText = score;
+            document.getElementById("life").innerText = life;
+
+            currentQuestionIndex++;
+
+            if (life <= 0) {
+                endGame();
+                return;
+            }
+
+            loadQuestion();
+        }
+
+        function endGame() {
+            document.getElementById("game-screen").classList.add("hidden");
+            document.getElementById("end-screen").classList.remove("hidden");
+
+            document.getElementById("final-score").innerText = score;
+        }
+
+        function restartGame() {
+            currentQuestionIndex = 0;
+            score = 0;
+            life = 5;
+
+            document.getElementById("start-screen").classList.remove("hidden");
+            document.getElementById("game-screen").classList.add("hidden");
+            document.getElementById("end-screen").classList.add("hidden");
+        }
+    </script>
+</body>
+</html>
